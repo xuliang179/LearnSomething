@@ -1,1 +1,33 @@
+#Docker的核心概念
+
+Docker的基本组成：
+-Docker Client客户端
+-Docker Daemon守护进程
+-Docker Image镜像
+-Docker Container容器
+-Docker Registry仓库
+
+三大核心：
+-镜像image
+-容器container
+-仓库repository
+#镜像image
+docker镜像，可以理解为一个面向docker引擎的只读模板，包含文件系统，镜像自身是只读的。
+容器从镜像启动的时候，docker会在镜像最上层创建一个可写层，镜像本身将保持不变。
+镜像是创建docker容器的基础。通过版本管理和增量的文件系统，docker提供了一套十分简单的机制来创建和更新现有镜像，
+用户甚至可以从网上下载一个已经做好的应用镜像，并使用
+#容器container
+docker容器container，利用容器来运行和隔离应用。
+容器是从镜像创建的应用运行实例，可以将其启动、开始、停止、删除，而这些容器都是相互隔离、互不可见，
+可以把容器看成一个简易版的linux系统环境（这包含root用户权限，进程空间、用户空间和网络空间等），以及运行在其中的应用程序打包而成的应用盒子
+#仓库repository
+docker仓库，是docker集中存放镜像文件的场所
+docker仓库repository和注册服务器registry混为一谈，并不严格区分。实际上，注册服务器是存放仓库的地方，其上往往存放多个仓库。
+每个仓库集中存放某一类镜像，往往包含多个镜像文件，通过不同的标签tag来区分
+docker仓库分公开库public和私有仓库private，最大公开库docker hub，存放了数量庞大的镜像。
+
+#docker安装
+对于centos7系统，由于centos-extras源中内置docker，可以直接yum install -y docker
+（上外网的环境下）如果不能把所需安装包和依赖包down到本机
+yum -y install http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm && yum install -y docker-io
 
