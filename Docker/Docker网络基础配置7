@@ -1,0 +1,52 @@
+#Docker网络基础配置
+
+网络基础配置
+大量的互联网应用服务包括多个服务组件，这往往需要多个容器之间通过网络通信进行相互配合
+docker目前提供了两种方式为容器提供网络服务：
+--映射容器端口到宿主主机
+--容器互联机制
+
+端口映射端口到宿主主机实现访问容器:
+从外部访问容器应用
+在启动容器的时候，如果不指定对应参数，在容器外部是无法通过网络来访问容器内的网络应用和服务。
+当容器中运行一些网络应用，要让外部访问这些应用时，可以通过-P或-p参数来指定端口映射。
+当使用-P标记时，docker会随机映射一个49000~49900的端口至容器内部开放的网络端口：
+docker run -d -P --name app1 centos /bin/python
+-p则可以指定要映射的端口，并且，在一个指定端口上只可以绑定一个容器。
+支持的格式有：ip:hostPort:containerPort  | ip::containerPort | hostPort:containerPort 
+eg:
+映射到指定地址的指定端口:
+使用hostPort:containerPort格式将本地的5000端口映射到容器的5000端口：
+docker run -d -p 5000:5000 centos
+映射所有接口地址：
+可以使用ip;hostPort:containerPort格式指定映射使用一个特定地址
+docker run -d -p 127.0.0.1::5000 centos
+查看映射端口配置
+使用docker port来查看当前映射的端口配置，也可以查看绑定的地址
+
+容器互联实现容器间的通信:
+容器的连接linking系统是除了端口映射另一种可以与容器中应用交互的方式。它会在源和接收容器之间创建一个隧道，接收容器可以看到源容器指定的信息
+
+自定义容器命名：
+连接系统依据容器的名称来执行，因此，首先需要自定义一个好记的容器命名。
+自定义命名容器有两个好处：
+自定义的命名，比较好记，比如一个web应用容器，我们可以给它起名叫web,当要连接其他容器时候，可以作为一个有用的参考点，比如连接web容器到db容器
+使用--name标记可以为容器自定义命名：
+docker run -d -P --name web centos 
+使用docker ps -l或docker inspect来查看容器的名字：
+docker inspect -f "{{ .Name }}" 93296fb48363
+容器的名称是唯一的，需要先用docker rm来删除之前创建的同名容器
+
+容器互联
+使用--link参数可以让容器之间安全的进行交互
+下面先创建一个新的数据库容器：
+docker run -d --name db centos
+删除之前创建的web容器：
+docker rm -f web
+然后创建一个新的web容器，并将它连接到db容器：
+docker run -d -P --name web --link db:db centos python app.py
+此时，db容器和web容器建立互联关系
+--link参数的格式为--link name:alias，其中name是要链接的容器的名称，alias是这个连接的别名
+
+
+
