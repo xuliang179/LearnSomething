@@ -1,0 +1,45 @@
+#Docker容器/仓库
+
+Docker容器：
+简单地说，容器是镜像的一个运行实例。所不同的是，它带有额外的可写文件层
+docker容器就是独立运行的一个或一组应用，以及它们的必需运行环境
+
+#容器操作
+启动容器:两种方式，一种是基于镜像新建一个容器并启动，另外一个是将在终止状态（stopped)的容器重新启动。
+所需命令docker run,当利用docker run来创建并启动容器时，docker在后台运行的标准操作包括：
+1.检查本地是否存在指定的镜像，不存在就从公有仓库下载
+2.利用镜像创建并启动一个容器
+3.分配一个文件系统，并在只读的镜像层外面挂载一层可读写层
+4.从宿主主机配置的网桥接口中桥接一个虚拟接口到容器中去
+5.从地址池配置一个IP地址给容器
+6.执行用户指定的应用程序
+7.执行完毕后容器被终止
+eg：docker run -t -i name:tag /bin/bash
+-t选项让docker分配一个伪终端并绑定到容器标准之上，-i则让容器的标准输入保持打开
+
+守护态运行:更多的时候，需要让docker容器在后台以守护态（daemonized）形式运行，用户可以通过-d参数来实现
+docker run -d ubuntu /bin/sh -c "while true;do echo hello wolrd; sleep 1;done"
+获取容器的输出信息，docker logs命令
+终止容器：docker stop 容器id
+查看处于终止状态的容器ID信息:docker ps -a -q
+处于终止状态的容器，可以通过docker start命令来重新启动
+进入容器：docker attach / docker exec /nsenter工具等
+docker attach id   
+删除容器：docker rm [options] container
+导出容器：是指导出一个已经创建的容器到一个文件，不管此时这个容器是否处于运动状态，可以使用docker export命令,docker export ce5 > test_for_run.tar
+可以将这些文件传输到其他机器上，在其他机器上通过导入命令实现容器的迁移
+导入容器：docker import命令导入，成为镜像,cat test_for_run.tar | docker import - test/ubuntu:v1.0
+docker load命令来导入镜像存储文件到本地镜像库，又可以docker import命令来导入
+
+nsenter工具
+docker inspect --format "{{ .State.Pid }}" b2197256c5ca
+nsenter --target 7925 --mount --uts --ipc --net --pid
+
+#仓库
+仓库repository是集中存放镜像的地方。一个容易与之混淆的概念是注册服务器registry。
+实际上注册服务器是存放仓库的具体服务器，每个服务器上可以有多个仓库，而每个仓库下面有多个镜像
+查看具体镜像:docker search centos
+下载镜像:docker pull centos
+创建和使用私有仓库:使用registry镜像创建私有仓库,安装docker后，可以通过官方提供的registry镜像来简单搭建一套本地私有仓库环境
+docker run -d -p 5000:5000 registry
+首先会自动下载并启动一个registry容器，创建本地的私有仓库服务，默认会将仓库创建在容器的/tmp/registry目录。可以通过-v参数来将镜像文件存放在本地的指定路径上
