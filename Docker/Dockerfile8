@@ -1,0 +1,16 @@
+#使用dockerfile创建镜像
+
+dockerfile是一个文本格式的配置文件，用户可以使用dockerfile快速创建自定义的镜像
+
+#基本结构
+基本结构：一般而言，Dockerfile分为四部分：基础镜像信息，维护者信息，镜像操作命令和容器启动时执行指令。例如：
+#第一行必须指定基于的基础镜像
+FROM centos
+#维护者信息
+MAINTAINER docker_user docker_user@email.com
+#镜像的操作命令
+RUN apt-get update
+#容器启动时执行指令
+CMD /usr/sbin/nginx
+
+指令：（待补充）  
